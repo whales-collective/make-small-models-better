@@ -1,10 +1,12 @@
 #!/bin/bash
-BASE_URL=http://localhost:12434/engines/llama.cpp/v1
-#MODEL="ai/smollm3:latest"
-#MODEL="ai/qwen2.5:3B-F16"
-
-#MODEL="ai/qwen2.5:latest"
-MODEL="ai/gemma3:latest"
+BASE_URL=${MODEL_RUNNER_BASE_URL:-http://localhost:12434/engines/llama.cpp/v1}
+#MODEL=${MODEL_QWEN2_5_MEDIUM:-"ai/qwen2.5:3B-F16"}
+#MODEL=${MODEL_QWEN2_5_LARGE:-"ai/qwen2.5:latest"}
+#MODEL=${MODEL_LUCY:-"hf.co/menlo/lucy-128k-gguf:q4_k_m"}
+#MODEL=${MODEL_QWEN3_LARGE:-"ai/qwen3:latest"}
+MODEL=${MODEL_GEMMA3:-"ai/gemma3:latest"}
+#MODEL=${MODEL_GEMMA3_TINY:-"ai/gemma3:1B-Q4_K_M"}
+#MODEL=${MODEL_SMOLLM3:-"ai/smollm3"}
 
 read -r -d '' JSON_SCHEMA <<- EOM
 {
@@ -104,7 +106,10 @@ read -r -d '' SYSTEM_INSTRUCTIONS <<- EOM
 You are an AI assistant that identifies tool calls from user input. 
 
 Available tools:
+[AVAILABLE_TOOLS]
 ${TOOLS}
+[/AVAILABLE_TOOLS]
+
 
 Instructions:
 1. Find ALL tool calls in the user input
@@ -144,25 +149,18 @@ read -r -d '' DATA <<- EOM
 }
 EOM
 
-# Keep DATA as is
-
-#echo "${DATA}" > debug.json
-#echo "JSON validation:" 
-#jq '.' debug.json
-
 JSON_RESULT=$(curl --silent ${BASE_URL}/chat/completions \
     -H "Content-Type: application/json" \
     -d "${DATA}"
 )
 
-echo "${JSON_RESULT}" 
-
-echo "📝 Raw JSON response:"
+echo -e "\n📝 Raw JSON response:\n"
 echo "${JSON_RESULT}" | jq '.'
 
 #echo "🔍 Extracted function calls:"
 # echo "${JSON_RESULT}" | jq -r '.choices[0].message.tool_calls[]? | "Function: \(.function.name), Args: \(.function.arguments)"'
 
-echo "📝 Extracted content from the response:"
+echo -e "\n📝 Extracted content from the response:\n"
 echo "${JSON_RESULT}" | jq -r '.choices[0].message.content'
+echo -e "\n"
 

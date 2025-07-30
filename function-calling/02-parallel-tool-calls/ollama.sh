@@ -1,7 +1,7 @@
 #!/bin/bash
 BASE_URL=http://localhost:11434/v1
-#MODEL="ai/smollm3:latest"
-MODEL="qwen2.5:3b"
+MODEL="qwen3:latest"
+
 # Tools index in JSON format
 read -r -d '' TOOLS <<- EOM
 [
@@ -79,12 +79,13 @@ JSON_RESULT=$(curl --silent ${BASE_URL}/chat/completions \
     -d "${DATA}"
 )
 
-echo "📝 Raw JSON response:"
+echo -e "\n📝 Raw JSON response:\n"
 echo "${JSON_RESULT}" | jq '.'
 
-echo "🔍 Extracted function calls:"
+echo -e "\n🔍 Extracted function calls:\n"
 echo "${JSON_RESULT}" | jq -r '.choices[0].message.tool_calls[]? | "Function: \(.function.name), Args: \(.function.arguments)"'
 
-echo "📝 Extracted content from the response:"
+echo -e "\n📝 Extracted content from the response:\n"
 echo "${JSON_RESULT}" | jq -r '.choices[0].message.content'
+echo -e "\n"
 

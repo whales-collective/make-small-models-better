@@ -1,10 +1,7 @@
 # docker compose up --build --no-log-prefix
 services:
-
   detect-one-tool:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     models:
       qwen2_5_tiny:
         endpoint_var: MODEL_RUNNER_BASE_URL
@@ -42,9 +39,7 @@ services:
       smollm3:
         endpoint_var: MODEL_RUNNER_BASE_URL
         model_var: MODEL_SMOLLM3
-      xlam2_8b:
-        endpoint_var: MODEL_RUNNER_BASE_URL
-        model_var: MODEL_XLAM2_8B
+
 
 models:
   qwen2_5_tiny:
@@ -71,5 +66,4 @@ models:
     model: ai/mistral:latest
   smollm3:	
     model: ai/smollm3:latest
-  xlam2_8b:
-    model: hf.co/salesforce/llama-xlam-2-8b-fc-r-gguf:q4_k_m
+

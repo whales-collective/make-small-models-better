@@ -1,16 +1,17 @@
-FROM golang:1.24.2-alpine AS builder
-
-WORKDIR /app
-COPY main.go .
-COPY go.mod .
+FROM debian:stable-slim
 
 RUN <<EOF
-go mod tidy 
-go build -o function-calling
+apt-get update
+apt-get install -y curl gpg jq
+apt-get clean
+rm -rf /var/lib/apt/lists/*
 EOF
 
-FROM scratch
+# Set working directory
 WORKDIR /app
-COPY --from=builder /app/function-calling .
 
-CMD ["./function-calling"]
+# Copy the main script
+COPY main.sh /app/main.sh
+
+# Start the main script
+CMD ["bash", "/app/main.sh"]

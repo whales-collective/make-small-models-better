@@ -1,7 +1,7 @@
 # docker compose up --build --no-log-prefix
 services:
 
-  detect-one-tool:
+  detect-all-tools-the-old-way:
     build:
       context: .
       dockerfile: Dockerfile
