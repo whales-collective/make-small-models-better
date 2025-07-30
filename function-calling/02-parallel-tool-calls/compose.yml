@@ -12,12 +12,33 @@ services:
       qwen2_5_medium:
         endpoint_var: MODEL_RUNNER_BASE_URL
         model_var: MODEL_QWEN2_5_MEDIUM
+      qwen2_5_large:
+        endpoint_var: MODEL_RUNNER_BASE_URL
+        model_var: MODEL_QWEN2_5_LARGE
       qwen3_tiny:
         endpoint_var: MODEL_RUNNER_BASE_URL
         model_var: MODEL_QWEN3_TINY
+      qwen3_large:
+        endpoint_var: MODEL_RUNNER_BASE_URL
+        model_var: MODEL_QWEN3_LARGE
       lucy:
         endpoint_var: MODEL_RUNNER_BASE_URL
         model_var: MODEL_LUCY
+      gemma3:
+        endpoint_var: MODEL_RUNNER_BASE_URL
+        model_var: MODEL_GEMMA3
+      gemma3_tiny:
+        endpoint_var: MODEL_RUNNER_BASE_URL
+        model_var: MODEL_GEMMA3_TINY
+      llama3_2:
+        endpoint_var: MODEL_RUNNER_BASE_URL
+        model_var: MODEL_LLAMA3_2
+      mistral:
+        endpoint_var: MODEL_RUNNER_BASE_URL
+        model_var: MODEL_MISTRAL
+      smollm3:
+        endpoint_var: MODEL_RUNNER_BASE_URL
+        model_var: MODEL_SMOLLM3
 
 
 models:
@@ -27,8 +48,22 @@ models:
     model: ai/qwen2.5:1.5B-F16
   qwen2_5_medium:
     model: ai/qwen2.5:3B-F16
+  qwen2_5_large:
+    model: ai/qwen2.5:latest
   qwen3_tiny:
     model: ai/qwen3:0.6B-F16
+  qwen3_large:
+    model: ai/qwen3:latest
   lucy:
     model: hf.co/menlo/lucy-128k-gguf:q4_k_m
+  gemma3:
+    model: ai/gemma3:latest 
+  gemma3_tiny:
+    model: ai/gemma3:1B-Q4_K_M
+  llama3_2:
+    model: ai/llama3.2:latest
+  mistral:
+    model: ai/mistral:latest
+  smollm3:	
+    model: ai/smollm3:latest
 

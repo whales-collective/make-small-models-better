@@ -49,7 +49,6 @@ func GetToolsIndex() []openai.ChatCompletionToolParam {
 	}
 }
 
-// MODEL_RUNNER_BASE_URL=http://localhost:12434 go run main.go
 func main() {
 	ctx := context.Background()
 
@@ -62,11 +61,18 @@ func main() {
 	}
 
 	models := []Model{
-		{Name: os.Getenv("MODEL_QWEN2_5_TINY"), Score: 0},
-		{Name: os.Getenv("MODEL_QWEN2_5_SMALL"), Score: 0},
-		{Name: os.Getenv("MODEL_QWEN2_5_MEDIUM"), Score: 0},
-		{Name: os.Getenv("MODEL_QWEN3_TINY"), Score: 0},
-		{Name: os.Getenv("MODEL_LUCY"), Score: 0},
+		{Name: os.Getenv("MODEL_QWEN2_5_TINY"), Score: 0}, 
+		{Name: os.Getenv("MODEL_QWEN2_5_SMALL"), Score: 0}, 
+		{Name: os.Getenv("MODEL_QWEN2_5_MEDIUM"), Score: 0}, 
+		{Name: os.Getenv("MODEL_QWEN2_5_LARGE"), Score: 0}, 
+		{Name: os.Getenv("MODEL_QWEN3_TINY"), Score: 0}, 
+		{Name: os.Getenv("MODEL_LUCY"), Score: 0}, 
+		{Name: os.Getenv("MODEL_QWEN3_LARGE"), Score: 0},
+		{Name: os.Getenv("MODEL_GEMMA3"), Score: 0},  
+		{Name: os.Getenv("MODEL_GEMMA3_TINY"), Score: 0}, 
+		{Name: os.Getenv("MODEL_LLAMA3_2"), Score: 0}, 
+		{Name: os.Getenv("MODEL_MISTRAL"), Score: 0}, 
+		{Name: os.Getenv("MODEL_SMOLLM3"), Score: 0}, 
 	}
 
 	client := openai.NewClient(
@@ -124,7 +130,7 @@ func main() {
 
 	}
 
-	numberOfIterations := 10
+	numberOfIterations := 3
 
 	for i := range numberOfIterations {
 		fmt.Println(i, ". Running detection for models...")

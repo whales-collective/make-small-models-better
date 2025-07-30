@@ -62,18 +62,18 @@ func main() {
 	}
 
 	models := []Model{
-		{Name: os.Getenv("MODEL_QWEN2_5_TINY"), Score: 0}, 
-		{Name: os.Getenv("MODEL_QWEN2_5_SMALL"), Score: 0}, 
-		{Name: os.Getenv("MODEL_QWEN2_5_MEDIUM"), Score: 0}, 
-		{Name: os.Getenv("MODEL_QWEN2_5_LARGE"), Score: 0}, 
-		{Name: os.Getenv("MODEL_QWEN3_TINY"), Score: 0}, 
-		{Name: os.Getenv("MODEL_LUCY"), Score: 0}, 
-		{Name: os.Getenv("MODEL_QWEN3_LARGE"), Score: 0},
-		{Name: os.Getenv("MODEL_GEMMA3"), Score: 0},  
-		{Name: os.Getenv("MODEL_GEMMA3_TINY"), Score: 0}, 
-		{Name: os.Getenv("MODEL_LLAMA3_2"), Score: 0}, 
-		{Name: os.Getenv("MODEL_MISTRAL"), Score: 0}, 
-		{Name: os.Getenv("MODEL_SMOLLM3"), Score: 0}, 
+		// {Name: os.Getenv("MODEL_QWEN2_5_TINY"), Score: 0},
+		// {Name: os.Getenv("MODEL_QWEN2_5_SMALL"), Score: 0},
+		//{Name: os.Getenv("MODEL_QWEN2_5_MEDIUM"), Score: 0},
+		// {Name: os.Getenv("MODEL_QWEN2_5_LARGE"), Score: 0},
+		// {Name: os.Getenv("MODEL_QWEN3_TINY"), Score: 0},
+		{Name: os.Getenv("MODEL_LUCY"), Score: 0},
+		// {Name: os.Getenv("MODEL_QWEN3_LARGE"), Score: 0},
+		// {Name: os.Getenv("MODEL_GEMMA3"), Score: 0},
+		// {Name: os.Getenv("MODEL_GEMMA3_TINY"), Score: 0},
+		// {Name: os.Getenv("MODEL_LLAMA3_2"), Score: 0},
+		// {Name: os.Getenv("MODEL_MISTRAL"), Score: 0},
+		//{Name: os.Getenv("MODEL_SMOLLM3"), Score: 0},
 	}
 
 	client := openai.NewClient(
@@ -82,6 +82,52 @@ func main() {
 	)
 
 	//userQuestion := openai.UserMessage("Say hello to Jean-Luc Picard")
+	systemInstructions := `
+	You are an AI assistant with access to a tools index. 
+	Your task is to analyze user input and identify ALL possible tool calls that can be made.
+	IMPORTANT: You must process the ENTIRE user input and identify ALL tool calls, not just the first few. 
+	Each line or request in the user input should be analyzed separately.
+	You have access to the tools index.
+
+	INSTRUCTIONS:
+	1. Read the ENTIRE user input carefully
+	2. Process each line/request separately
+	3. For each request, check if it matches any tool description from the tools index in the [AVAILABLE_TOOLS] section
+	4. If multiple tool calls are needed, include ALL of them in your response
+	5. NEVER stop processing until you've analyzed the complete input
+
+	TOOL MATCHING RULES:
+	- Match tool calls based on the "description" field of each tool
+	- Use the exact "Name" field from the tool definition -> be focused on the "name" field
+	- Provide all required arguments as specified in the tool's properties fields
+	- If the number of arguments is not the same as the tool's properties, ignore that tool call and do not include it in the response
+	- If the tool call is not found in the tools index, ignore it and do not include it in the response
+
+	USAGE OF add_two_numbers:
+	For the add_two_numbers tool, extract number1 and number2 from these patterns:
+	- "Add X and Y" → number1: X, number2: Y
+	- "X + Y" → number1: X, number2: Y  
+	- "Add X to Y" → number1: X, number2: Y
+	- "Sum of X and Y" → number1: X, number2: Y
+	- Always use the EXACT numbers found in the text, not random values
+
+	USAGE OF say_hello:
+	For say_hello tool, extract names from these patterns:
+	- "Say hello to NAME" → name: "NAME"
+	- "Hello NAME" → name: "NAME"
+	- "Greet NAME" → name: "NAME"
+	- "Say hi to NAME" → name: "NAME"
+	- Extract the EXACT name mentioned after "to", "hello", or greeting words
+	- Names can include spaces (e.g., "Jean-Luc Picard", "Bob Morane")
+
+	STRICT VALIDATION:
+	- ONLY use tools that exist in the [AVAILABLE_TOOLS] section
+	- Tool names MUST match exactly: "say_hello" and "add_two_numbers" ONLY
+	- Do NOT create calls for non-existent tools like "send_message", "operation", "greetings", etc.
+	- If a request cannot be fulfilled by available tools, ignore it completely
+
+	CRITICAL: You must analyze the COMPLETE user input and identify ALL possible tool calls. Do not stop after finding the first few matches.
+	`
 
 	detectToolCall := func(model string, userQuestion string, theNumberOfExpectedCalls int) int {
 
@@ -89,6 +135,7 @@ func main() {
 
 		params := openai.ChatCompletionNewParams{
 			Messages: []openai.ChatCompletionMessageParamUnion{
+				openai.SystemMessage(systemInstructions),
 				openai.UserMessage(userQuestion),
 			},
 			ParallelToolCalls: openai.Bool(true),
@@ -103,6 +150,8 @@ func main() {
 			fmt.Println("🔴 Model:", model, "Error:", err)
 			return success
 		}
+
+		fmt.Println("🟪 Response:\n", completion.Choices[0].Message.Content)
 
 		toolCalls := completion.Choices[0].Message.ToolCalls
 
@@ -129,7 +178,7 @@ func main() {
 
 	}
 
-	numberOfIterations := 3
+	numberOfIterations := 1
 
 	userQuestion := `
 	Tell me why the sky is blue and then say hello to Jean-Luc Picard. I love pineapple pizza!
@@ -152,7 +201,6 @@ func main() {
 		}
 	}
 
-	
 	fmt.Println("Final scores:")
 	for _, model := range models {
 		fmt.Println("- Model:", model.Name, "Final Score:", model.Score, "Percentage:", float64(model.Score)/float64(numberOfIterations*nbToolCallExpectedPerIteration)*100, "%")

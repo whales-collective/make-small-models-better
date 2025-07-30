@@ -2,6 +2,8 @@
 services:
   detect-one-tool:
     build: .
+    volumes:
+      - ./output:/app/output
     models:
       qwen2_5_tiny:
         endpoint_var: MODEL_RUNNER_BASE_URL
